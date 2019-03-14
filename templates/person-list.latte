@@ -1,0 +1,16 @@
+{layout 'layout.latte'}
+
+{block title}
+  List
+{/block}
+
+{block content}
+  <div>
+    <h2>List page</h2>
+    {foreach $persons as $person}
+      <div id="person_{$person['id']}">
+        <p>{$iterator->counter}. {$person['name']}</p>
+      </div>
+    {/foreach}
+  </div>
+{/block}

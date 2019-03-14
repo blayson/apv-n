@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>{block title}{/block}</title>
+    <link href='//fonts.googleapis.com/css?family=Lato:300' rel='stylesheet' type='text/css'>
+    {*<link rel="stylesheet" href="{$basePath}/public/css/bootstrap/css/bootstrap.min.css">*}
+    {*<link rel="stylesheet" href="{$basePath}/public/css/font-awesome/css/all.min.css">*}
+    <!-- you custom CSS file has to be last to override Bootstrap -->
+    <link rel="stylesheet" href="{$basePath}/public/css/custom.css">
+    <!-- jQuery has to come first because Bootstrap JS depends on it -->
+    {*<script type="text/javascript" src="{$basePath}/public/js/jquery-3.3.1.min.js"></script>*}
+    {*<script type="text/javascript" src="{$basePath}/public/css/bootstrap/js/bootstrap.bundle.min.js"></script>*}
+</head>
+<body>g
+{include 'sidebar.latte'}
+<div class="container">
+    {block content}
+    {/block}
+</div>
+</body>
+</html>
