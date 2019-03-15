@@ -9,7 +9,7 @@
     <h2>List page</h2>
     {foreach $persons as $person}
       <div id="person_{$person['id']}">
-        <p>{$iterator->counter}. {$person['name']}</p>
+        <p>{$iterator->counter}. <a href="{link personDetail ['id' => $person['id']]}">{$person['name']}</a></p>
       </div>
     {/foreach}
   </div>
