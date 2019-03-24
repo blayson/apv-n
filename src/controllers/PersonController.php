@@ -14,6 +14,8 @@ use Slim\Http\Response;
 
 class PersonController extends BaseController
 {
+    protected $personArr = [];
+
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
@@ -22,20 +24,23 @@ class PersonController extends BaseController
     public function home(Request $request, Response $response, $args)
     {
         $person = $this->container->get('PersonModel');
-        $args['persons'] = [
-            '1' => ['name' => 'Andrii', 'id' => '1'],
-            '2' => ['name' => 'Alex', 'id' => '2'],
-            '3' => ['name' => 'Lena', 'id' => '3'],
-            '4' => ['name' => 'Danylo', 'id' => '4'],
-        ];
+        $args['persons'] = [];
 
+        $db = $this->container->get('db');
+        $stmt = $db->query("SELECT * FROM person ORDER BY first_name");
+        $persons = $stmt->fetchAll();
+        foreach ($persons as $person) {
+            $args['persons'] += [
+                $person['id_person'] => ['name' => $person['first_name'], 'id' => $person['id_person']]
+            ];
+        }
         return $this->container->get('view')->render($response, 'person-list.latte', $args);
     }
 
     public function addPerson(Request $request, Response $response, $args)
     {
         if ($request->isPost()) {
-            $args['id'] = '42';
+            $this->personArr[''] = ' ';
             return $this->container->get('view')->render($response, 'done.latte', $args);
         }
 

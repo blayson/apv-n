@@ -42,9 +42,7 @@ $container['view'] = function ($c) {
 $container['db'] = function ($c) {
    $db = $c['settings']['db'];
    //connect to database
-   $pdo = new PDO($db['dbtype'] . ":host=" . $db['dbhost'] . ";dbname=" . $db['dbname'],
-                  $db['dbuser'],
-                  $db['dbpass']);
+   $pdo = new PDO($db['dbtype'] . ":host=" . $db['dbhost'] . ";dbname=" . $db['dbname'], $db['dbuser'], $db['dbpass']);
    //define error mode -> we want to throw exceptions
    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
    //define how should fetch() and fetchAll() work
