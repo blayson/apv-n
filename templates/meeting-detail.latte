@@ -1,0 +1,11 @@
+{extends layout.latte}
+
+{block title}Meeting{/block}
+
+{block content}
+    <h1>Meeting {$meetingInfo['id_meeting']}</h1>
+{*    <p>{$meetingInfo['street_name']}</p>*}
+{*    <p>{$meetingInfo['city']}</p>*}
+    <p>{$meetingInfo['description']}</p>
+{*    <p>{$meetingInfo['street_number']}</p>*}
+{/block}

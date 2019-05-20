@@ -1,0 +1,32 @@
+{extends layout.latte}
+
+{block title}Meetings{/block}
+
+{block content}
+    <div class="container">
+        <h1> Meetings </h1>
+
+        <table class="table table-hover">
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col">Time</th>
+                <th scope="col" >Description</th>
+                <th scope="col" >Duration</th>
+                <th scope="col" >City</th>
+                <th scope="col" >Street name</th>
+            </tr>
+            <tbody>
+            {foreach $meetings as $m}
+                <tr onclick="document.location = '{link meetingDetail ['id' => $m['id_meeting']]}' " style="cursor: pointer;">
+                    <td> {$m['start']}</td>
+                    <td> {$m['description']}</td>
+                    <td> {$m['duration']}</td>
+                    <td> {ifset $m['city']} {$m['city']} {/ifset}</td>
+                    <td> {ifset $m['street_name']} {$m['street_name']} {/ifset}</td>
+                </tr>
+            {/foreach}
+            </tbody>
+
+        </table>
+    </div>
+{/block}

@@ -8,60 +8,120 @@
 
 namespace Controllers;
 
+use Controllers\Exceptions\DuplicateException;
+use Exception;
+use Models\PersonModel;
 use Psr\Container\ContainerInterface;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
 class PersonController extends BaseController
 {
-    protected $personArr = [];
+    /* @var $person PersonModel */
+    protected $person;
+    protected $view;
 
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
+        $this->person = $container->get('PersonModel');
+        $this->view = $container->get('view');
     }
 
-    public function home(Request $request, Response $response, $args)
+    public function __invoke(Request $request, Response $response, $args)
     {
-        $person = $this->container->get('PersonModel');
-        $args['persons'] = [];
+        $tplVars['persons'] = $this->person->getPersons();
+        return $this->view->render($response, 'persons-list.latte', $tplVars);
+    }
 
-        $db = $this->container->get('db');
-        $stmt = $db->query("SELECT * FROM person ORDER BY first_name");
-        $persons = $stmt->fetchAll();
-        foreach ($persons as $person) {
-            $args['persons'] += [
-                $person['id_person'] => ['name' => $person['first_name'], 'id' => $person['id_person']]
+    public function newPerson(Request $request, Response $response, $args)
+    {
+        if ($request->isGet() ) {
+            $tplVars['form'] = [
+                'first_name' => '',
+                'last_name' => '',
+                'gender' => '',
+                'height' => 180,
+                'nickname' => '',
+                'birth_day' => '',
             ];
+            // CSRF token name and value
+            $mergedTplVars = array_merge($tplVars, $this->getCsrfValues($request));
+            return $this->view->render($response, 'new-person.latte', $mergedTplVars);
         }
-        return $this->container->get('view')->render($response, 'person-list.latte', $args);
+
+        if ($request->isPost()) {
+            $data = $request->getParsedBody();
+            try {
+                $this->person->newPerson($data, function (Exception $e) {
+                    if ($e->getCode() == 23505) {
+                        throw new DuplicateException('Duplicate values');
+                    } else {
+//                        var_dump($e);
+                        die($e->getMessage());
+                    }
+                });
+            } catch (DuplicateException $e) {
+                $tplVars['error'] = 'Duplicate values';
+                $tplVars['form'] = $data;
+                $mergedTplVars = array_merge($tplVars, $this->getCsrfValues($request));
+                return $this->view->render($response, 'new-person.latte', $mergedTplVars);
+            }
+        }
+        return $response->withRedirect($this->container->get('router')->pathFor('newPerson'), 301);
     }
 
-    public function addPerson(Request $request, Response $response, $args)
-    {
-        if ($request->isPost()) {
-            $this->personArr[''] = ' ';
-            return $this->container->get('view')->render($response, 'done.latte', $args);
-        }
-
-        // CSRF token name and value
+    protected function getCsrfValues(Request $request) {
         $nameKey = $this->csrf->getTokenNameKey();
         $valueKey = $this->csrf->getTokenValueKey();
         $name = $request->getAttribute($nameKey);
         $value = $request->getAttribute($valueKey);
 
-        $args['nameKey'] = $nameKey;
-        $args['valueKey'] = $valueKey;
-        $args['name'] = $name;
-        $args['value'] = $value;
-
-        return $this->container->get('view')->render($response, 'add-person.latte', $args);
+        $tplVars['nameKey'] = $nameKey;
+        $tplVars['valueKey'] = $valueKey;
+        $tplVars['name'] = $name;
+        $tplVars['value'] = $value;
+        return $tplVars;
     }
 
     public function detail(Request $request, Response $response, $args)
     {
-        $person = $this->container->get('PersonModel');
-        $args['personName'] = $person->getName();
-        return $this->container->get('view')->render($response, 'person.latte', $args);
+        $id = $args['id'];
+        $personInfo = $this->person->getFullInformation($id)->fetchAll();
+        $tplVars['personInfo'] = $personInfo[0];
+
+        return $this->view->render($response, 'person-detail.latte', $tplVars);
+    }
+
+    public function edit(Request $request, Response $response, $args)
+    {
+        if ($request->isPost()) {
+            $data = $request->getParsedBody();
+            $this->person->editPerson($data);
+            return $response->withRedirect($this->container->get('router')->pathFor('personsList'), 301);
+        }
+
+        $id = $args['id'];
+        $person = $this->person->getPersonById($id);
+
+        $tplVars['form'] = [
+            'fn' => $person['first_name'],
+            'ln' => $person['last_name'],
+            'nn' => $person['nickname'],
+            'h' => $person['height'],
+            'g' => $person['gender'],
+            'bd' => $person['birth_day'],
+            'id' => $person['id_person'],
+            'idl' => $person['id_location'],
+        ];
+        $mergedTplVars = array_merge($tplVars, $this->getCsrfValues($request));
+        return $this->view->render($response, 'edit-person.latte', $mergedTplVars);
+    }
+
+    public function delete(Request $request, Response $response, $args)
+    {
+        $id = $request->getQueryParams()['id_person'];
+        $this->person->deletePerson($id);
+        return $response->withRedirect($this->container->get('router')->pathFor('personsList'), 301);
     }
 }

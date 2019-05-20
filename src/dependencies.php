@@ -52,4 +52,14 @@ $container['db'] = function ($c) {
    return $pdo;
 };
 
-$container['PersonModel'] = new Models\PersonModel();
+$container['PersonModel'] = new Models\PersonModel($container);
+$container['MeetingModel'] = new Models\MeetingModel($container);
+$container['LocationModel'] = new Models\LocationModel($container);
+
+$c['errorHandler'] = function ($c) {
+    return function ($request, $response, $exception) use ($c) {
+        return $response->withStatus(500)
+            ->withHeader('Content-Type', 'text/html')
+            ->write('Something went wrong!');
+    };
+};

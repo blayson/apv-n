@@ -1,0 +1,41 @@
+{layout 'layout.latte'}
+
+{block title}
+  Add New Meeting
+{/block}
+
+{block content}
+  <div class="">
+    <h2>Add meeting</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <form action="{link newMeeting}" method="POST">
+        <input type="hidden" name="{$nameKey}" value="{$name}">
+        <input type="hidden" name="{$valueKey}" value="{$value}">
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="description">Description:</label>
+            <input class="form-control" type="text" name="description" id="description">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="duration">Duration:</label>
+            <input class="form-control" type="time" name="duration" id="duration">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="start">Start:</label>
+            <input class="form-control" type="date" name="start" id="start">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="start">Location:</label>
+            <input class="form-control" type="search" name="id_location" id="location">
+          </div>
+        </div>
+        <input class="btn btn-primary" type="submit" value="Submit" name="submit" title="submit">
+        </div>
+      </form>
+    </div>
+  </div>
+{/block}

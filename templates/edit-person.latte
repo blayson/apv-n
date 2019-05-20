@@ -1,0 +1,40 @@
+{extends layout.latte}
+
+{block title}Edit person{/block}
+
+{block content}
+    <div class="container">
+        <h1>Edit Person</h1>
+        <form action="{link editPerson}" method="post">
+            <input type="hidden" name="{$nameKey}" value="{$name}">
+            <input type="hidden" name="{$valueKey}" value="{$value}">
+            <label>
+                First Name <input type="text" name="first_name" value="{$form['fn']}">
+            </label>
+            <label>
+                Last Name <input type="text" name="last_name" value="{$form['ln']}">
+            </label>
+            <label>
+                <select name="gender">
+                    <option value="male" {if $form['g'] == 'male'} selected {/if}>male</option>
+                    <option value="female"{if $form['g'] == 'female'} selected {/if}>female</option>
+                </select>
+            </label>
+            <label>
+                Height <input type="text" name="height" value="{$form['h']}">
+            </label>
+            <label>
+                Nickname <input type="text" name="nickname" value="{$form['nn']}">
+            </label>
+
+            <label>
+                Birth day <input type="date" name="birth_day" value="{$form['bd']}">
+            </label>
+            <label>
+                Id location <input type="text" name="id_location" value="{$form['idl']}">
+            </label>
+            <input type="hidden" name="id_person" value="{$form['id']}">
+            <input type="submit" name="submit">
+        </form>
+    </div>
+{/block}
