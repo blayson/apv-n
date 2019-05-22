@@ -17,6 +17,8 @@ $app->group('/meetings', function (App $app) {
     $app->get('', Controllers\MeetingController::class . ':home')->setName('meetingsList');
     $app->get('/{id:[0-9]+}', Controllers\MeetingController::class . ':detail')->setName('meetingDetail');
     $app->map(['GET', 'POST'], '/new', Controllers\MeetingController::class . ':newMeeting')->setName('newMeeting');
+    $app->map(['GET', 'POST'], '/edit[/{id:[0-9]+}]', Controllers\MeetingController::class . ':editMeeting')->setName('editMeeting');
+    $app->map(['GET', 'POST'], '/delete', Controllers\MeetingController::class . ':delete')->setName('deleteMeeting');
 });
 
 //$app->group('/auth', function (App $app) {

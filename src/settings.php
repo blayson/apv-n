@@ -20,6 +20,9 @@ return [
            'dbuser' => getenv('DB_USER'),
            'dbpass' => getenv('DB_PASS')
        ],
+        'api_keys' => [
+            'gmaps' => getenv('GOOGLE_MAPS')
+        ],
 
         // Monolog settings
         'logger' => [

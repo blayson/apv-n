@@ -8,6 +8,8 @@
 
 namespace Controllers;
 
+use DateTime;
+use Exception;
 use Models\MeetingModel;
 use Psr\Container\ContainerInterface;
 use Slim\Http\Request;
@@ -28,7 +30,24 @@ class MeetingController extends BaseController
 
     public function home(Request $request, Response $response, $args)
     {
-        $tplVars['meetings'] = $this->meeting->getMeetings();
+        $meetings = $this->meeting->getMeetings();
+        $dtNow = new DateTime();
+        try {
+            foreach ($meetings as $key => $meeting) {
+                $dt = new DateTime($meeting['start']);
+                if ($dt < $dtNow) {
+                    $meetings[$key]['relevant'] = false;
+                } else {
+                    $meetings[$key]['relevant'] = true;
+                }
+                $timezone = $dt->getTimezone();
+                $formattedDate = $dt->format('Y-m-d H:i:s');
+                $meetings[$key]['date']['date'] = $formattedDate;
+                $meetings[$key]['date']['timezone'] = $timezone->getName();
+            }
+        } catch (Exception $e) {}
+
+        $tplVars['meetings'] = $meetings;
         return $this->view->render($response, 'meetings-list.latte', $tplVars);
     }
 
@@ -38,6 +57,8 @@ class MeetingController extends BaseController
         $meetingInfo = $this->meeting->getMeetingById($id);
 
         $tplVars['meetingInfo'] = $meetingInfo;
+        $tplVars['maps_key'] = $this->container->get('settings')['api_keys']['gmaps'];
+        $tplVars['persons'] = $this->meeting->getAllPersonsOnMeeting($id);
         return $this->view->render($response, 'meeting-detail.latte', $tplVars);
     }
 
@@ -60,5 +81,15 @@ class MeetingController extends BaseController
         $tplVars['name'] = $name;
         $tplVars['value'] = $value;
         return $this->view->render($response, 'new-meeting.latte', $tplVars);
+    }
+
+    public function editMeeting(Request $request, Response $response, $args)
+    {
+
+    }
+
+    public function delete(Request $request, Response $response, $args)
+    {
+
     }
 }

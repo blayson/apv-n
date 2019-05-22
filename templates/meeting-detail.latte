@@ -3,9 +3,47 @@
 {block title}Meeting{/block}
 
 {block content}
-    <h1>Meeting {$meetingInfo['id_meeting']}</h1>
-{*    <p>{$meetingInfo['street_name']}</p>*}
-{*    <p>{$meetingInfo['city']}</p>*}
-    <p>{$meetingInfo['description']}</p>
-{*    <p>{$meetingInfo['street_number']}</p>*}
+    <div class="row">
+        <div class="col-md-6">
+            <h1>Meeting {$meetingInfo['id_meeting']}</h1>
+            <p>{$meetingInfo['street_name']}</p>
+            <p>{$meetingInfo['city']}</p>
+            <p>{$meetingInfo['description']}</p>
+            <p>{$meetingInfo['street_number']}</p>
+            <p>{$meetingInfo['zip']}</p>
+            <p id=meetingName>{$meetingInfo['name']}</p>
+            <p>{$meetingInfo['country']}</p>
+            <p>{$meetingInfo['start']}</p>
+            <p>{$meetingInfo['description']}</p>
+            <p>{$meetingInfo['duration']}</p>
+        </div>
+        <div class="col-md-6">
+            <input type="hidden" id="mapsLat" value="{$meetingInfo['latitude']}">
+            <input type="hidden" id="mapsLng" value="{$meetingInfo['longitude']}">
+            <div id="map" n:tag-if="$meetingInfo['latitude'] && $meetingInfo['longitude']"></div>
+        </div>
+    </div>
+    <div class="row">
+        <table class="table table-striped table-hover">
+            <thead>
+            <tr>
+                <th>Nickname</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Gender</th>
+            </tr>
+            </thead>
+            <tbody>
+            {foreach $persons as $p}
+                <tr onclick="document.location = '{link personDetail ['id' => $p['id_person']]}'"
+                    style="cursor: pointer;">
+                    <td> {$p['nickname']}</td>
+                    <td> {$p['first_name']}</td>
+                    <td> {$p['last_name']}</td>
+                    <td> {$p['gender']}</td>
+                </tr>
+            {/foreach}
+            </tbody>
+        </table>
+    </div>
 {/block}

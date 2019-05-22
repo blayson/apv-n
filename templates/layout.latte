@@ -13,6 +13,8 @@
           href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
           crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+          integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css">
     {*<link rel="stylesheet" href="{$basePath}/public/css/font-awesome/css/all.min.css">*}
     <!-- you custom CSS file has to be last to override Bootstrap -->
@@ -21,6 +23,14 @@
     <title>{block title}{/block}</title>
 </head>
 <body>
+{include 'nav-bar.latte'}
+<div class="container">
+    {ifset $error}
+        <p class="alert-danger">{$error}</p>
+    {/ifset}
+    {block content}
+    {/block}
+</div>
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
@@ -32,14 +42,8 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
-
-{include 'nav-bar.latte'}
-<div class="container">
-    {ifset $error}
-        <p class="alert-danger">{$error}</p>
-    {/ifset}
-    {block content}
-    {/block}
-</div>
+<script type='text/javascript' src='/js/map.js'></script>
+<script src="https://maps.googleapis.com/maps/api/js?key={$maps_key}&callback=initMap"
+        async defer></script>
 </body>
 </html>

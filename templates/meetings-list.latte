@@ -6,27 +6,46 @@
     <div class="container">
         <h1> Meetings </h1>
 
-        <table class="table table-hover">
-            <thead class="thead-dark">
+        <table class="table table-hover table-striped">
+            <thead class="">
             <tr>
-                <th scope="col">Time</th>
-                <th scope="col" >Description</th>
-                <th scope="col" >Duration</th>
-                <th scope="col" >City</th>
-                <th scope="col" >Street name</th>
+                <th scope="col"> </th>
+                <th scope="col">Date</th>
+                <th scope="col">Timezone</th>
+                <th scope="col">Description</th>
+                <th scope="col">Country</th>
+                <th scope="col">City</th>
+                <th scope="col">Street name</th>
+                <th scope="col"> </th>
+                <th scope="col"> </th>
             </tr>
             <tbody>
             {foreach $meetings as $m}
-                <tr onclick="document.location = '{link meetingDetail ['id' => $m['id_meeting']]}' " style="cursor: pointer;">
-                    <td> {$m['start']}</td>
-                    <td> {$m['description']}</td>
-                    <td> {$m['duration']}</td>
-                    <td> {ifset $m['city']} {$m['city']} {/ifset}</td>
-                    <td> {ifset $m['street_name']} {$m['street_name']} {/ifset}</td>
+                <tr onclick="document.location = '{link meetingDetail ['id' => $m['id_meeting']]}' "
+                    style="cursor: pointer;">
+                    <td>{if $m['relevant']}<i class="fa fa-calendar"></i>{else}<i class="fa fa-calendar-times"></i>{/if}</td>
+                    <td>{$m['date']['date']}</td>
+                    <td>{ifset $m['date']['timezone']}{$m['date']['timezone']}{/ifset}</td>
+                    <td>{$m['description']}</td>
+                    <td>{ifset $m['country']} {$m['country']} {else} Czech Republic {/ifset}</td>
+                    <td>{ifset $m['city']} {$m['city']} {/ifset}</td>
+                    <td>{ifset $m['street_name']} {$m['street_name']} {/ifset}</td>
+                    <td>
+                        <form action="{link editMeeting ['id' => $m['id_meeting']]}" method="get">
+                            <input type="submit" value="edit" class="btn btn-primary">
+                        </form>
+                    </td>
+                    <td>
+                        <form action="{link deleteMeeting}" method="get"
+                              onsubmit="return confirm('Opravdu chcete smazat?')">
+                            <input type="hidden" name="id_person" value="{$m['id_meeting']}">
+                            <input type="submit" value="&times;" class="btn btn-danger">
+                        </form>
+                    </td>
                 </tr>
             {/foreach}
             </tbody>
-
         </table>
+
     </div>
 {/block}

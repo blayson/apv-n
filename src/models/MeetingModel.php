@@ -17,15 +17,17 @@ class MeetingModel extends BaseModel
 
     public function getMeetings()
     {
-        $query = "SELECT id_meeting, start, description, duration, id_location FROM meeting";
+        $query = "SELECT m.id_meeting, m.start, l.street_name, m.description, m.duration, l.country, l.city, l.name FROM meeting as m
+    LEFT JOIN location l on m.id_location = l.id_location ORDER BY m.start DESC";
         $stmt = $this->handleQuery($query);
         return $stmt->fetchAll();
     }
 
     public function getMeetingById($id)
     {
-        if (empty($this->person)) {
-            $query = "SELECT id_meeting, start, description, duration, id_location FROM meeting WHERE id_meeting = :id ";
+        if (empty($this->meeting)) {
+            $query = "SELECT * FROM meeting as m 
+    LEFT JOIN location l on m.id_location = l.id_location WHERE id_meeting = :id ";
             $bindVals = [':id' => $id];
             $stmt = $this->handleQuery($query, $bindVals);
             $this->meeting = $stmt->fetchAll()[0];
@@ -43,5 +45,13 @@ class MeetingModel extends BaseModel
             ':idl' => $data['id_location'],
         ];
         $this->handleQuery($query, $values);
+    }
+
+    public function getAllPersonsOnMeeting($id) {
+        $query = "SELECT p.id_person, nickname, first_name, last_name, gender FROM person p
+    INNER JOIN (SELECT id_person FROM person_meeting WHERE id_meeting = :id) a on a.id_person = p.id_person";
+        $bindVals = [':id' => $id];
+        $stmt = $this->handleQuery($query, $bindVals);
+        return $stmt->fetchAll();
     }
 }

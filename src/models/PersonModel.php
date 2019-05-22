@@ -111,11 +111,11 @@ WHERE id_person = :id";
     {
         $query = "INSERT INTO person (birth_day, gender, first_name, last_name, height, nickname) VALUES (:bd, :g, :fn, :ln, :hg, :nn)";
         $values = [
-            ':bd' => !empty($data['birth_day']) ? $data['birth_day'] : null,
+            ':bd' => empty($data['birth_day']) ? null : $data['birth_day'],
             ':fn' => $data['first_name'],
             ':ln' => $data['last_name'],
             ':g' => isset($data['gender']) ? $data['gender'] : null,
-            ':hg' => !empty($data['height']) ? $data['height'] : null,
+            ':hg' => empty($data['height']) ? null : $data['height'],
             ':nn' => $data['nickname'],
         ];
         $this->handleQuery($query, $values, $callback);
@@ -136,6 +136,16 @@ from person p
     left join contact_type ct on c.id_contact_type = ct.id_contact_type
     left join location l on p.id_location = l.id_location
 where p.id_person = :id";
+
+        $values = [':id' => $id];
+        return $this->handleQuery($query, $values, $callback);
+    }
+
+    public function getAllPersonMeetings($id, $callback = null)
+    {
+        $query = "SELECT m.id_meeting, start, description, city, name, country FROM meeting m
+    INNER JOIN (SELECT id_meeting FROM person_meeting WHERE id_person = :id) idm on idm.id_meeting = m.id_meeting
+    LEFT JOIN location l on m.id_location = l.id_location";
 
         $values = [':id' => $id];
         return $this->handleQuery($query, $values, $callback);

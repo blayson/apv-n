@@ -4,31 +4,59 @@
 {/block}
 
 {block content}
-  <div>
-    <h2>{$personInfo['first_name']} {$personInfo['last_name']}</h2>
-    <p>Height: {$personInfo['height']}</p>
-    <p>Gender: {$personInfo['gender']}</p>
-    <p>Birth day: {$personInfo['birth_day']}</p>
-    <p>Nickname: {$personInfo['nickname']}</p>
-    <p>City: {$personInfo['city']}</p>
-    <p>Country: {$personInfo['country']}</p>
-    <p>Street name: {$personInfo['street_name']}</p>
-    <p>Street number: {$personInfo['street_number']}</p>
-    <p>Zip: {$personInfo['zip']}</p>
-    <p>Contact {$personInfo['contact_type']}: {$personInfo['contact']}</p>
-  </div>
-  <div class="form-row">
-    <div class="container co">
-      <form action="{link deletePerson}" method="get" onsubmit="return confirm('Opravdu chcete smazat?')">
-        <input type="hidden" name="id_person" value="{$personInfo['id_person']}">
-        <input type="submit" value="delete" class="btn btn-danger">
-      </form>
+  <div class="row">
+    <div class="col-md-4">
+      <h2>{$personInfo['first_name']} {$personInfo['last_name']}</h2>
+      <p>Height: {$personInfo['height']}</p>
+      <p>Gender: {$personInfo['gender']}</p>
+      <p>Birth day: {$personInfo['birth_day']}</p>
+      <p>Nickname: {$personInfo['nickname']}</p>
+      <p>City: {$personInfo['city']}</p>
+      <p>Country: {$personInfo['country']}</p>
+      <p>Street name: {$personInfo['street_name']}</p>
+      <p>Street number: {$personInfo['street_number']}</p>
+      <p>Zip: {$personInfo['zip']}</p>
+      <p>Contact {$personInfo['contact_type']}: {$personInfo['contact']}</p>
+      <div class="form-row">
+        <div class="container">
+          <form action="{link deletePerson}" method="get" onsubmit="return confirm('Opravdu chcete smazat?')">
+            <input type="hidden" name="id_person" value="{$personInfo['id_person']}">
+            <input type="submit" value="delete" class="btn btn-danger">
+          </form>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="container">
+          <form action="{link editPerson}" method="get">
+            <input type="hidden" name="id_person" value="{$personInfo['id_person']}">
+            <input type="submit" value="edit" class="btn btn-primary">
+          </form>
+        </div>
+      </div>
     </div>
-    <div class="container">
-      <form action="{link editPerson}" method="get">
-        <input type="hidden" name="id_person" value="{$personInfo['id_person']}">
-        <input type="submit" value="edit" class="btn btn-primary">
-      </form>
+    <div class="col-md-8">
+      {if $meetings}
+        <table class="table table-hover">
+          <thead class="thead-light">
+          <tbody>
+          {var $default = 'Czech Republic'}
+          {foreach $meetings as $m}
+            <tr onclick="document.location = '{link meetingDetail ['id' => $m['id_meeting']]}' " style="cursor: pointer;">
+              <td> {$iterator->counter} </td>
+              <td> {$m['start']}</td>
+              <td> {$m['description']}</td>
+              <td> {ifset $m['country']} {$m['country']} {else} Czech Republic {/ifset}</td>
+              <td> {ifset $m['city']} {$m['city']} {/ifset}</td>
+              <td> {ifset $m['street_name']} {$m['street_name']} {/ifset}</td>
+            </tr>
+          {/foreach}
+          </tbody>
+        </table>
+      {else}
+        <p>You do not have any meetings</p>
+      {/if}
     </div>
+
   </div>
+
 {/block}

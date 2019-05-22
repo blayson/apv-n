@@ -89,7 +89,7 @@ class PersonController extends BaseController
         $id = $args['id'];
         $personInfo = $this->person->getFullInformation($id)->fetchAll();
         $tplVars['personInfo'] = $personInfo[0];
-
+        $tplVars['meetings'] = $this->person->getAllPersonMeetings($id)->fetchAll();
         return $this->view->render($response, 'person-detail.latte', $tplVars);
     }
 
