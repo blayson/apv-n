@@ -30,7 +30,11 @@ class PersonController extends BaseController
 
     public function __invoke(Request $request, Response $response, $args)
     {
-        $tplVars['persons'] = $this->person->getPersons();
+        $persons = $this->person->getPersons();
+        foreach ($persons as $key => $person) {
+            $persons[$key]['age'] = explode(' ', $person['age'])[0];
+        }
+        $tplVars['persons'] = $persons;
         return $this->view->render($response, 'persons-list.latte', $tplVars);
     }
 

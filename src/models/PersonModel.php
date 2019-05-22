@@ -16,7 +16,7 @@ class PersonModel extends BaseModel
 
     public function getPersons($order = 'last_name')
     {
-        $query = "SELECT id_person, nickname, first_name, last_name, birth_day, height, gender, id_location FROM person";
+        $query = "SELECT id_person, nickname, first_name, last_name, AGE(birth_day), height, gender, id_location FROM person";
         $stmt = $this->handleQuery($query);
         return $stmt->fetchAll();
     }

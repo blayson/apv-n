@@ -10,6 +10,7 @@ namespace Controllers;
 
 use DateTime;
 use Exception;
+use Models\LocationModel;
 use Models\MeetingModel;
 use Psr\Container\ContainerInterface;
 use Slim\Http\Request;
@@ -40,10 +41,9 @@ class MeetingController extends BaseController
                 } else {
                     $meetings[$key]['relevant'] = true;
                 }
-                $timezone = $dt->getTimezone();
-                $formattedDate = $dt->format('Y-m-d H:i:s');
-                $meetings[$key]['date']['date'] = $formattedDate;
-                $meetings[$key]['date']['timezone'] = $timezone->getName();
+                $meetings[$key]['date']['date'] = $dt->format('Y-m-d');;
+                $meetings[$key]['date']['time'] = $dt->format('H:i');;
+                $meetings[$key]['date']['timezone'] = $dt->getTimezone()->getName();
             }
         } catch (Exception $e) {}
 
@@ -64,6 +64,8 @@ class MeetingController extends BaseController
 
     public function newMeeting(Request $request, Response $response, $args)
     {
+        $tplVars = [];
+
         if ($request->isPost()) {
             $data = $request->getParsedBody();
 //            array_key_exists('location');
@@ -80,6 +82,12 @@ class MeetingController extends BaseController
         $tplVars['valueKey'] = $valueKey;
         $tplVars['name'] = $name;
         $tplVars['value'] = $value;
+
+        /* @var  $locations LocationModel */
+        $locationModel = $this->container->get('LocationModel');
+//        $locations = $locationModel->getLocations()->fetchAll();
+
+//        $tplVars['locations'] = $locations;
         return $this->view->render($response, 'new-meeting.latte', $tplVars);
     }
 

@@ -21,6 +21,10 @@ $app->group('/meetings', function (App $app) {
     $app->map(['GET', 'POST'], '/delete', Controllers\MeetingController::class . ':delete')->setName('deleteMeeting');
 });
 
+$app->group('/ajax', function (App $app) {
+   $app->map(['GET', 'POST'], '/location', Controllers\AjaxController::class . ':getLocation')->setName('getLocation');
+});
+
 //$app->group('/auth', function (App $app) {
 //
 //});

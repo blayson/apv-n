@@ -16,11 +16,27 @@ class LocationModel extends BaseModel
         parent::__construct($container);
     }
 
-    public function getLocations()
+    public function getLocations($pattern, $callback = null)
     {
-        $query = "SELECT id_location, city, street_name, street_number, zip, country, name, latitude, longitude FROM location";
-        $stmt = $this->handleQuery($query);
-        return $stmt->fetchAll();
+        $pattern = strtolower($pattern);
+        $query = "SELECT id_location, city, street_name, street_number, zip, country, name FROM location
+WHERE lower(city) LIKE :p0 or lower(street_name) LIKE :p1 or lower(country) LIKE :p3 or lower(name) LIKE :p4";
+        $bind = [
+            ':p0' => $pattern,
+            ':p1' => $pattern,
+            ':p3' => $pattern,
+            ':p4' => $pattern,
+        ];
+        if (preg_match('%(cz|cze|czech)%', $pattern)) {
+            $query = "SELECT id_location, city, street_name, street_number, zip, country, name FROM location
+WHERE lower(city) LIKE :p0 or lower(street_name) LIKE :p1 or lower(country) ISNULL or lower(name) LIKE :p4";
+            $bind = [
+                ':p0' => $pattern,
+                ':p1' => $pattern,
+                ':p4' => $pattern,
+            ];
+        }
+        return $this->handleQuery($query, $bind, $callback);
     }
 
     public function getLocationById($id)

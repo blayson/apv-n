@@ -47,3 +47,9 @@
         </table>
     </div>
 {/block}
+
+{block scripts}
+    <script type='text/javascript' src='/js/map.js'></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={ifset $maps_key}{$maps_key}{/ifset}&callback=initMap"
+            async defer></script>
+{/block}

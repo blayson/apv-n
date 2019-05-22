@@ -18,7 +18,7 @@ class BaseModel
         $this->db = $this->container->get('db');
     }
 
-    protected function handleQuery($query, $bindVals = null, $callback = null)
+    protected function handleQuery($query, $bindVals = null, $callback = null, $option = null)
     {
         /* @var $stmt PDOStatement */
         try {
