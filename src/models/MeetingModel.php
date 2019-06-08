@@ -35,7 +35,7 @@ class MeetingModel extends BaseModel
         return $this->meeting;
     }
 
-    public function newMeeting($data)
+    public function newMeeting($data, $callback = null)
     {
         $query = "INSERT INTO meeting (start, description, duration, id_location) VALUES (:st, :dsc, :dur, :idl)";
         $values = [
@@ -44,14 +44,24 @@ class MeetingModel extends BaseModel
             ':dur' => $data['duration'],
             ':idl' => $data['id_location'],
         ];
-        $this->handleQuery($query, $values);
+        $this->handleQuery($query, $values, $callback);
     }
 
-    public function getAllPersonsOnMeeting($id) {
+    public function getAllPersonsOnMeeting($id)
+    {
         $query = "SELECT p.id_person, nickname, first_name, last_name, gender FROM person p
     INNER JOIN (SELECT id_person FROM person_meeting WHERE id_meeting = :id) a on a.id_person = p.id_person";
         $bindVals = [':id' => $id];
-        $stmt = $this->handleQuery($query, $bindVals);
-        return $stmt->fetchAll();
+        return $this->handleQuery($query, $bindVals);
+    }
+
+    public function addPersonToMeeting($idMeeting, $idPerson, $callback = null)
+    {
+        $query = "INSERT INTO person_meeting (id_person, id_meeting)  VALUES (:idp, :idm)";
+        $bindVals = [
+            ':idm' => $idMeeting,
+            ':idp' => $idPerson
+        ];
+        $this->handleQuery($query, $bindVals, $callback);
     }
 }

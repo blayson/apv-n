@@ -34,6 +34,6 @@ function initMap() {
       lng: pos.lng()
     },
     map: map,
-    title: document.getElementById('meetingName').innerText,
+    title: document.getElementById('markerName').innerText,
   });
 }

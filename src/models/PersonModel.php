@@ -17,8 +17,17 @@ class PersonModel extends BaseModel
     public function getPersons($order = 'last_name')
     {
         $query = "SELECT id_person, nickname, first_name, last_name, AGE(birth_day), height, gender, id_location FROM person";
-        $stmt = $this->handleQuery($query);
-        return $stmt->fetchAll();
+        return $this->handleQuery($query);
+    }
+
+    public function getNotParticipatePersons($idMeeting)
+    {
+        $query = "SELECT DISTINCT person.id_person, nickname, first_name, last_name, gender FROM person
+    inner join person_meeting pm on pm.id_person = person.id_person WHERE id_meeting <> :idm";
+        $bind = [
+            ':idm' => $idMeeting
+        ];
+        return $this->handleQuery($query, $bind);
     }
 
     /**
@@ -109,7 +118,7 @@ WHERE id_person = :id";
 
     public function newPerson($data, $callback = null)
     {
-        $query = "INSERT INTO person (birth_day, gender, first_name, last_name, height, nickname) VALUES (:bd, :g, :fn, :ln, :hg, :nn)";
+        $query = "INSERT INTO person (birth_day, gender, first_name, last_name, height, nickname, id_location) VALUES (:bd, :g, :fn, :ln, :hg, :nn, :idl)";
         $values = [
             ':bd' => empty($data['birth_day']) ? null : $data['birth_day'],
             ':fn' => $data['first_name'],
@@ -117,6 +126,7 @@ WHERE id_person = :id";
             ':g' => isset($data['gender']) ? $data['gender'] : null,
             ':hg' => empty($data['height']) ? null : $data['height'],
             ':nn' => $data['nickname'],
+            ':idl' => $data['id_location']
         ];
         $this->handleQuery($query, $values, $callback);
     }
@@ -130,7 +140,7 @@ WHERE id_person = :id";
 
     function getFullInformation($id, $callback = null)
     {
-        $query = "SELECT p.id_person, p.nickname, p.first_name, p.last_name, contact, city, p.gender, p.height, p.birth_day, l.country, l.street_number, l.street_name, l.zip, ct.name as contact_type
+        $query = "SELECT p.id_person, latitude, longitude, p.nickname, p.first_name, p.last_name, contact, city, p.gender, p.height, p.birth_day, l.country, l.street_number, l.street_name, l.name, l.zip, ct.name as contact_type
 from person p
     left join contact c on p.id_person = c.id_person
     left join contact_type ct on c.id_contact_type = ct.id_contact_type

@@ -18,30 +18,28 @@ class AjaxController extends BaseController
         $this->view = $container->get('view');
     }
 
-    public function getLocation(Request $request, Response $response)
+    public function getLocationAjax(Request $request, Response $response)
     {
         $locationModel = $this->container->get('LocationModel');
         $data = $request->getQueryParams()['term'];
         $locations = $locationModel->getLocations('%' . $data . '%')->fetchAll();
-
-        $nameKey = $this->csrf->getTokenNameKey();
-        $valueKey = $this->csrf->getTokenValueKey();
-        $name = $request->getAttribute($nameKey);
-        $value = $request->getAttribute($valueKey);
-
-        $data = [
-            $nameKey => $name,
-            $valueKey => $value,
-        ];
-
+        $data = [];
         foreach ($locations as $location){
             $country = empty($location['country']) ? 'Czech Republic' : ucfirst($location['country']);
             $city = ucfirst($location['city']);
             $streetName = ucfirst($location['street_name']);
             $name = ucfirst($location['name']);
-            $data['location'][] = ['value' => "{$country} {$city} {$streetName} {$name}"];
+            $data['location'][] = [
+                'value' => "{$country} {$city} {$streetName} {$name}",
+                'id' => $location['id_location']
+            ];
         }
 
         return $response->withJson($data, 200);
+    }
+
+    public function addPersonToMeetingAjax(Request $request, Response $response)
+    {
+
     }
 }

@@ -4,7 +4,9 @@
 namespace Controllers\Exceptions;
 
 
-class DuplicateException extends \PDOException
+use Exception;
+
+class DuplicateException extends Exception
 {
 
 }

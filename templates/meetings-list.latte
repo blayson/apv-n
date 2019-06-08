@@ -9,15 +9,15 @@
         <table class="table table-hover table-striped">
             <thead class="">
             <tr>
-                <th scope="col"> </th>
+                <th scope="col"></th>
                 <th scope="col">Date</th>
                 <th scope="col">Time</th>
                 <th scope="col">Timezone</th>
                 <th scope="col">Country</th>
                 <th scope="col">City</th>
                 <th scope="col">Street name</th>
-                <th scope="col"> </th>
-                <th scope="col"> </th>
+                <th scope="col"></th>
+                <th scope="col"></th>
             </tr>
             <tbody>
             {foreach $meetings as $m}
@@ -31,13 +31,17 @@
                     <td>{ifset $m['city']} {$m['city']} {/ifset}</td>
                     <td>{ifset $m['street_name']} {$m['street_name']} {/ifset}</td>
                     <td>
+                        <a href="{link addPersonToMeeting ['idMeeting' => $m['id_meeting']]}"
+                           id="addPersonToMeeting-{$m['id_meeting']}" data-id="{$m['id_meeting']}" class="btn-primary btn">Add</a>
+                    </td>
+                    <td>
                         <form action="{link editMeeting ['id' => $m['id_meeting']]}" method="get">
-                            <input type="submit" value="edit" class="btn btn-primary">
+                            <input type="submit" value="Edit" class="btn btn-primary">
                         </form>
                     </td>
                     <td>
                         <form action="{link deleteMeeting}" method="get"
-                              onsubmit="return confirm('Opravdu chcete smazat?')">
+                              onsubmit="return confirm('Do you really want to delete?')">
                             <input type="hidden" name="id_person" value="{$m['id_meeting']}">
                             <input type="submit" value="&times;" class="btn btn-danger">
                         </form>

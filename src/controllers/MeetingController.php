@@ -1,17 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: andriibut
- * Date: 2019-03-25
- * Time: 12:56
- */
 
 namespace Controllers;
 
+use Controllers\Exceptions\DuplicateException;
 use DateTime;
 use Exception;
-use Models\LocationModel;
 use Models\MeetingModel;
+use Models\PersonModel;
 use Psr\Container\ContainerInterface;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -45,7 +40,8 @@ class MeetingController extends BaseController
                 $meetings[$key]['date']['time'] = $dt->format('H:i');;
                 $meetings[$key]['date']['timezone'] = $dt->getTimezone()->getName();
             }
-        } catch (Exception $e) {}
+        } catch (Exception $e) {
+        }
 
         $tplVars['meetings'] = $meetings;
         return $this->view->render($response, 'meetings-list.latte', $tplVars);
@@ -58,37 +54,47 @@ class MeetingController extends BaseController
 
         $tplVars['meetingInfo'] = $meetingInfo;
         $tplVars['maps_key'] = $this->container->get('settings')['api_keys']['gmaps'];
-        $tplVars['persons'] = $this->meeting->getAllPersonsOnMeeting($id);
+        $tplVars['persons'] = $this->meeting->getAllPersonsOnMeeting($id)->fetchAll();
         return $this->view->render($response, 'meeting-detail.latte', $tplVars);
     }
 
     public function newMeeting(Request $request, Response $response, $args)
     {
-        $tplVars = [];
+        $tplVars['form'] = [
+            'start' => '',
+            'duration' => '',
+            'description' => '',
+            'location' => '',
+            'id_location' => ''
+        ];
 
         if ($request->isPost()) {
             $data = $request->getParsedBody();
-//            array_key_exists('location');
-            $this->meeting->newMeeting($data);
+            $sqlParams = [
+                'start' => $data['start'],
+                'description' => $data['description'],
+                'duration' => $data['duration'],
+                'id_location' => $data['id_location']
+            ];
+            try {
+                $this->meeting->newMeeting($sqlParams, function (Exception $e) {
+                    if ($e->getCode() == 23505) {
+                        throw new DuplicateException('Duplicate values');
+                    } else {
+                        die($e->getMessage());
+                    }
+                });
+            } catch (DuplicateException $e) {
+                $tplVars['error'] = 'Duplicate values';
+                $tplVars['form'] = $data;
+                $mergedTplVars = array_merge($tplVars, $this->getCsrfValues($request));
+                return $this->view->render($response, 'new-meeting.latte', $mergedTplVars);
+            }
             return $response->withRedirect($this->container->get('router')->pathFor('newMeeting'), 301);
         }
-        // CSRF token name and value
-        $nameKey = $this->csrf->getTokenNameKey();
-        $valueKey = $this->csrf->getTokenValueKey();
-        $name = $request->getAttribute($nameKey);
-        $value = $request->getAttribute($valueKey);
 
-        $tplVars['nameKey'] = $nameKey;
-        $tplVars['valueKey'] = $valueKey;
-        $tplVars['name'] = $name;
-        $tplVars['value'] = $value;
-
-        /* @var  $locations LocationModel */
-        $locationModel = $this->container->get('LocationModel');
-//        $locations = $locationModel->getLocations()->fetchAll();
-
-//        $tplVars['locations'] = $locations;
-        return $this->view->render($response, 'new-meeting.latte', $tplVars);
+        $mergedTplVars = array_merge($tplVars, $this->getCsrfValues($request));
+        return $this->view->render($response, 'new-meeting.latte', $mergedTplVars);
     }
 
     public function editMeeting(Request $request, Response $response, $args)
@@ -99,5 +105,37 @@ class MeetingController extends BaseController
     public function delete(Request $request, Response $response, $args)
     {
 
+    }
+
+    public function addPersonToMeeting(Request $request, Response $response, $args)
+    {
+        /* @var $personModel PersonModel */
+        $personModel = $this->container->get('PersonModel');
+        $idMeeting = $request->getAttribute('idMeeting');
+        $persons = $personModel->getNotParticipatePersons($idMeeting)->fetchAll();
+        $tplVars['persons'] = $persons;
+        $tplVars['id_meeting'] = $idMeeting;
+
+        if ($request->isPost()) {
+            $data = $request->getParsedBody();
+            try {
+                $this->meeting->addPersonToMeeting($data['id_meeting'], $data['id_person'], function (Exception $e) {
+                    if ($e->getCode() == 23505) {
+                        throw new DuplicateException('Duplicate values');
+                    } else {
+                        die($e->getMessage());
+                    }
+                });
+            } catch (DuplicateException $e) {
+                $tplVars['error'] = 'Duplicate values';
+                $tplVars['form'] = $data;
+                $mergedTplVars = array_merge($tplVars, $this->getCsrfValues($request));
+                return $this->view->render($response, 'add-person.latte', $mergedTplVars);
+            }
+
+            return $response->withRedirect($this->container->get('router')->pathFor('addPersonToMeeting', ['idMeeting' => $data['id_meeting']]), 301);
+        }
+        $mergedTplVars = array_merge($tplVars, $this->getCsrfValues($request));
+        return $this->view->render($response, 'add-person.latte', $mergedTplVars);
     }
 }

@@ -16,22 +16,23 @@
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="description">Description:</label>
-                        <input class="form-control" type="text" name="description" id="description">
+                        <input class="form-control" type="text" name="description" id="description" value="{$form['description']}">
                     </div>
                     <div class="form-group col-md-6">
                         <label for="duration">Duration:</label>
-                        <input class="form-control" type="time" name="duration" id="duration">
+                        <input class="form-control" type="time" name="duration" id="duration" value="{$form['duration']}" required>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="start">Start:</label>
-                        <input class="form-control" type="date" name="start" id="start">
+                        <input class="form-control" type="date" name="start" id="start" value="{$form['start']}" required>
                     </div>
                     <div class="form-group col-md-6 ui-widget">
                         <label for="inputLocation">Location:</label>
+                        <input type="hidden" id="idLocation" name="id_location" value="">
                         <input class="form-control" type="search" placeholder="Search.."
-                               name="id_location" id="inputLocation" autocomplete="off">
+                               name="location" id="inputLocation" autocomplete="off" required>
                     </div>
 
                 </div>

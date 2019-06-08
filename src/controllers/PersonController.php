@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: andriibut
- * Date: 2019-03-13
- * Time: 22:08
- */
 
 namespace Controllers;
 
@@ -30,7 +24,7 @@ class PersonController extends BaseController
 
     public function __invoke(Request $request, Response $response, $args)
     {
-        $persons = $this->person->getPersons();
+        $persons = $this->person->getPersons()->fetchAll();
         foreach ($persons as $key => $person) {
             $persons[$key]['age'] = explode(' ', $person['age'])[0];
         }
@@ -40,28 +34,31 @@ class PersonController extends BaseController
 
     public function newPerson(Request $request, Response $response, $args)
     {
-        if ($request->isGet() ) {
-            $tplVars['form'] = [
-                'first_name' => '',
-                'last_name' => '',
-                'gender' => '',
-                'height' => 180,
-                'nickname' => '',
-                'birth_day' => '',
-            ];
-            // CSRF token name and value
-            $mergedTplVars = array_merge($tplVars, $this->getCsrfValues($request));
-            return $this->view->render($response, 'new-person.latte', $mergedTplVars);
-        }
+        $tplVars['form'] = [
+            'first_name' => '',
+            'last_name' => '',
+            'gender' => '',
+            'height' => 180,
+            'nickname' => '',
+            'birth_day' => '',
+        ];
 
         if ($request->isPost()) {
             $data = $request->getParsedBody();
+            $sqlData = [
+                'birth_day' => $data['birth_day'],
+                'first_name' => $data['first_name'],
+                'last_name' => $data['last_name'],
+                'gender' => $data['gender'],
+                'height' => $data['height'],
+                'nickname' => $data['nickname'],
+                'id_location' => empty($data['id_location']) ? null : $data['id_location']
+            ];
             try {
-                $this->person->newPerson($data, function (Exception $e) {
+                $this->person->newPerson($sqlData, function (Exception $e) {
                     if ($e->getCode() == 23505) {
                         throw new DuplicateException('Duplicate values');
                     } else {
-//                        var_dump($e);
                         die($e->getMessage());
                     }
                 });
@@ -71,27 +68,18 @@ class PersonController extends BaseController
                 $mergedTplVars = array_merge($tplVars, $this->getCsrfValues($request));
                 return $this->view->render($response, 'new-person.latte', $mergedTplVars);
             }
+            return $response->withRedirect($this->container->get('router')->pathFor('newPerson'), 301);
         }
-        return $response->withRedirect($this->container->get('router')->pathFor('newPerson'), 301);
-    }
 
-    protected function getCsrfValues(Request $request) {
-        $nameKey = $this->csrf->getTokenNameKey();
-        $valueKey = $this->csrf->getTokenValueKey();
-        $name = $request->getAttribute($nameKey);
-        $value = $request->getAttribute($valueKey);
-
-        $tplVars['nameKey'] = $nameKey;
-        $tplVars['valueKey'] = $valueKey;
-        $tplVars['name'] = $name;
-        $tplVars['value'] = $value;
-        return $tplVars;
+        $mergedTplVars = array_merge($tplVars, $this->getCsrfValues($request));
+        return $this->view->render($response, 'new-person.latte', $mergedTplVars);
     }
 
     public function detail(Request $request, Response $response, $args)
     {
         $id = $args['id'];
         $personInfo = $this->person->getFullInformation($id)->fetchAll();
+        $tplVars['maps_key'] = $this->container->get('settings')['api_keys']['gmaps'];
         $tplVars['personInfo'] = $personInfo[0];
         $tplVars['meetings'] = $this->person->getAllPersonMeetings($id)->fetchAll();
         return $this->view->render($response, 'person-detail.latte', $tplVars);

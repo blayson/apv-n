@@ -7,37 +7,50 @@
   <div class="row">
     <div class="col-md-4">
       <h2>{$personInfo['first_name']} {$personInfo['last_name']}</h2>
-      <p>Height: {$personInfo['height']}</p>
-      <p>Gender: {$personInfo['gender']}</p>
-      <p>Birth day: {$personInfo['birth_day']}</p>
-      <p>Nickname: {$personInfo['nickname']}</p>
-      <p>City: {$personInfo['city']}</p>
-      <p>Country: {$personInfo['country']}</p>
-      <p>Street name: {$personInfo['street_name']}</p>
-      <p>Street number: {$personInfo['street_number']}</p>
-      <p>Zip: {$personInfo['zip']}</p>
-      <p>Contact {$personInfo['contact_type']}: {$personInfo['contact']}</p>
-      <div class="form-row">
-        <div class="container">
-          <form action="{link deletePerson}" method="get" onsubmit="return confirm('Opravdu chcete smazat?')">
-            <input type="hidden" name="id_person" value="{$personInfo['id_person']}">
-            <input type="submit" value="delete" class="btn btn-danger">
-          </form>
-        </div>
+      <div class="">
+        <p>Height: {$personInfo['height']}</p>
+        <p>Gender: {$personInfo['gender']}</p>
+        <p>Birth day: {$personInfo['birth_day']}</p>
+        <p>Nickname: {$personInfo['nickname']}</p>
+        <p>City: {$personInfo['city']}</p>
+        <p>Country: {$personInfo['country']}</p>
+        <p>Street name: {$personInfo['street_name']}</p>
+        <p>Street number: {$personInfo['street_number']}</p>
+        <p id="markerName">Name: {$personInfo['name']}</p>
+        <p>Zip: {$personInfo['zip']}</p>
+        <p>Contact {$personInfo['contact_type']}: {$personInfo['contact']}</p>
       </div>
-      <div class="form-row">
-        <div class="container">
-          <form action="{link editPerson}" method="get">
-            <input type="hidden" name="id_person" value="{$personInfo['id_person']}">
-            <input type="submit" value="edit" class="btn btn-primary">
-          </form>
-        </div>
+
+      <div class="row container">
+        <form action="{link editPerson ['id' => $personInfo['id_person']]}" method="get">
+          <input type="submit" value="Edit" class="btn btn-primary">
+        </form>
+        <form action="{link deletePerson}" method="get" onsubmit="return confirm('Opravdu chcete smazat?')">
+          <input type="hidden" name="id_person" value="{$personInfo['id_person']}">
+          <input type="submit" value="Delete" class="btn btn-danger">
+        </form>
       </div>
     </div>
     <div class="col-md-8">
+      <input type="hidden" id="mapsLat" value="{$personInfo['latitude']}">
+      <input type="hidden" id="mapsLng" value="{$personInfo['longitude']}">
+      <div id="map" n:tag-if="$personInfo['latitude'] && $personInfo['longitude']"></div>
+    </div>
+  </div>
+  <div class="row">
+{*    <div class="col-md-8">*}
       {if $meetings}
         <table class="table table-hover">
           <thead class="thead-light">
+          <tr>
+            <th></th>
+            <th></th>
+            <th>Meetings</th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+          </thead>
           <tbody>
           {var $default = 'Czech Republic'}
           {foreach $meetings as $m}
@@ -53,10 +66,15 @@
           </tbody>
         </table>
       {else}
-        <p>You do not have any meetings</p>
+        <p>Person doesn't have any meetings</p>
       {/if}
-    </div>
+{*    </div>*}
 
   </div>
 
+{/block}
+{block scripts}
+  <script type='text/javascript' src='/js/map.js'></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key={ifset $maps_key}{$maps_key}{/ifset}&callback=initMap"
+          async defer></script>
 {/block}

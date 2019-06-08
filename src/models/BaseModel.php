@@ -2,7 +2,6 @@
 
 namespace Models;
 
-use Controllers\Exceptions\DuplicateException;
 use Exception;
 use PDOStatement;
 use Psr\Container\ContainerInterface;

@@ -5,36 +5,71 @@
 {block content}
     <div class="container">
         <h1>Edit Person</h1>
-        <form action="{link editPerson}" method="post">
-            <input type="hidden" name="{$nameKey}" value="{$name}">
-            <input type="hidden" name="{$valueKey}" value="{$value}">
-            <label>
-                First Name <input type="text" name="first_name" value="{$form['fn']}">
-            </label>
-            <label>
-                Last Name <input type="text" name="last_name" value="{$form['ln']}">
-            </label>
-            <label>
-                <select name="gender">
-                    <option value="male" {if $form['g'] == 'male'} selected {/if}>male</option>
-                    <option value="female"{if $form['g'] == 'female'} selected {/if}>female</option>
-                </select>
-            </label>
-            <label>
-                Height <input type="text" name="height" value="{$form['h']}">
-            </label>
-            <label>
-                Nickname <input type="text" name="nickname" value="{$form['nn']}">
-            </label>
 
-            <label>
-                Birth day <input type="date" name="birth_day" value="{$form['bd']}">
-            </label>
-            <label>
-                Id location <input type="text" name="id_location" value="{$form['idl']}">
-            </label>
-            <input type="hidden" name="id_person" value="{$form['id']}">
-            <input type="submit" name="submit">
-        </form>
+        <div class="row">
+            <div class="col-md-6">
+                <form action="{link editPerson}" method="post">
+                    <input type="hidden" name="{$nameKey}" value="{$name}">
+                    <input type="hidden" name="{$valueKey}" value="{$value}">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>First Name:</label>
+                            <input class="form-control" type="text" name="first_name" value="{$form['fn']}">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Last Name:</label>
+
+                            <input class="form-control" type="text" name="last_name" value="{$form['ln']}">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <div class="form-group ui-widget">
+                                <label for="inputLocation">Location:</label>
+                                <input type="hidden" id="idLocation" name="id_location" value="{$form['idl']}">
+                                <input class="form-control" type="search" placeholder="Search for location.."
+                                       name="location" id="inputLocation" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="">Height:</label>
+                            <input class="form-control" type="text" name="height" value="{$form['h']}">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Nickname:</label>
+                            <input class="form-control" type="text" name="nickname" value="{$form['nn']}">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Birth day:</label>
+                            <input class="form-control" type="date" name="birth_day" value="{$form['bd']}">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                    </div>
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="gender" value="male" id="male"
+                                   {if $form['g'] == 'male'}checked{/if}>
+                            <label class="form-check-label" for="male">Male</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="gender" value="female" id="female"
+                                   {if $form['g'] == 'female'}checked{/if}>
+                            <label class="form-check-label" for="female">Female</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="gender" value="other" id="other"
+                                   {if $form['g'] == 'other'}checked{/if}>
+                            <label class="form-check-label" for="other">Other</label>
+                        </div>
+                    </div>
+                    <input type="hidden" name="id_person" value="{$form['id']}">
+                    <input type="submit" name="submit" class="btn btn-primary" value="Edit">
+                </form>
+            </div>
+        </div>
     </div>
 {/block}

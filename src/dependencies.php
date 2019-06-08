@@ -39,27 +39,35 @@ $container['view'] = function ($c) {
     return $latteView;
 };
 
-$container['db'] = function ($c) {
-   $db = $c['settings']['db'];
-   //connect to database
-   $pdo = new PDO($db['dbtype'] . ":host=" . $db['dbhost'] . ";dbname=" . $db['dbname'], $db['dbuser'], $db['dbpass']);
-   //define error mode -> we want to throw exceptions
-   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-   //define how should fetch() and fetchAll() work
-   $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-   //configure character set for database communication - everything is UTF-8
-   $pdo->query("SET NAMES 'utf8'");
-   return $pdo;
+$container['db'] = function (\Slim\Container $c) use ($app) {
+    try {
+        $db = $c['settings']['db'];
+        //connect to database
+        $pdo = new PDO($db['dbtype'] . ":host=" . $db['dbhost'] . ";dbname=" . $db['dbname'], $db['dbuser'], $db['dbpass']);
+        //define error mode -> we want to throw exceptions
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        //define how should fetch() and fetchAll() work
+        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        //configure character set for database communication - everything is UTF-8
+        $pdo->query("SET NAMES 'utf8'");
+        return $pdo;
+    } catch (\PDOException $e) {
+//        $app->respond($c->get('response')->withStatus(500)
+//            ->withHeader('Content-Type', 'text/html')
+//            ->write('Could not connect to database'));
+        die('Could not connect to database');
+    }
+
 };
 
 $container['PersonModel'] = new Models\PersonModel($container);
 $container['MeetingModel'] = new Models\MeetingModel($container);
 $container['LocationModel'] = new Models\LocationModel($container);
 
-$c['errorHandler'] = function ($c) {
-    return function ($request, $response, $exception) use ($c) {
+$c['pdoConnectionHandler'] = function ($c) {
+    return function ($e, $response, $request) use ($c) {
         return $response->withStatus(500)
             ->withHeader('Content-Type', 'text/html')
-            ->write('Something went wrong!');
+            ->write($e->getMessage());
     };
 };
